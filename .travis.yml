@@ -1,2 +1,3 @@
 language: ruby
-script: echo $varname
+
+yscript: echo $varname
