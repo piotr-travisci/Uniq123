@@ -16,7 +16,7 @@ matrix:
   include:
   - stage: test
     os: linux
-    env: NAME=mypy
+    env: NAME=mypyi
     env:
         secure: dGVzdCBtZXNzYWdl
     python: '3.6'
