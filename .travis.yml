@@ -1,2 +1,2 @@
 language: ruby
-script: echo "uniq123"
+script: echo $varname
