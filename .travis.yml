@@ -1,82 +1,13 @@
-sudo: false
-language: python
-cache:
-  directories:
-  - ".benchmarks"
-branches:
-  only:
-  - master
-before_install:
-- pip install --upgrade pip setuptools wheel
-stages:
-- test
-- name: deploy
-  if: type = push AND branch = master
-matrix:
-  include:
-  - stage: test
-    os: linux
-    env: NAME=mypyi
-    env:
-        secure: dGVzdCBtZXNzYWdl
-    python: '3.6'
-    install:
-    - cat dev_tools/conf/pip-list-dev-tools.txt | grep mypy | xargs pip install
-    script: check/mypy
-  - stage: test
-    os: linux
-    env: NAME=pylint
-    python: '3.6'
-    install:
-    - cat dev_tools/conf/pip-list-dev-tools.txt | grep "pylint\|astroid" | grep -v
-      "#" | xargs pip install
-    script: check/pylint
-  - stage: test
-    os: linux
-    env: NAME=format
-    python: '3.6'
-    install:
-    - cat dev_tools/conf/pip-list-dev-tools.txt | grep yapf | xargs pip install
-    script: check/format-incremental
-  - stage: test
-    os: linux
-    env: NAME=pytest-and-incremental-coverage
-    python: '3.6'
-    install:
-    - pip install -r requirements.txt
-    - pip install -r cirq/contrib/contrib-requirements.txt
-    - pip install -r dev_tools/conf/pip-list-dev-tools.txt
-    script: check/pytest-and-incremental-coverage master --actually-quiet
-  - stage: test
-    os: linux
-    env: NAME=pytest (without contrib)
-    python: '3.7'
-    install:
-    - pip install -r requirements.txt
-    - pip install -r dev_tools/conf/pip-list-dev-tools.txt
-    script: check/pytest --ignore=cirq/contrib --benchmark-skip --actually-quiet
-  - stage: test
-    os: windows
-    env: NAME=pytest (Windows)
-    language: sh
-    python: '3.7.3'
-    before_install:
-    - powershell -command 'Set-MpPreference -DisableArchiveScanning $true'
-    - powershell -command 'Set-MpPreference -DisableBehaviorMonitoring $true'
-    - powershell -command 'Set-MpPreference -DisableRealtimeMonitoring $true'
-    - choco install python --version 3.7.3
-    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
-    - python -m pip install --upgrade pip wheel
-    install:
-    - python -m pip install -r requirements.txt
-    - python -m pip install -r cirq/contrib/contrib-requirements.txt
-    - python -m pip install -r dev_tools/conf/pip-list-dev-tools.txt
-    script: check/pytest --benchmark-skip --actually-quiet
-  - stage: test
-    os: linux
-    env: NAME=doctest
-    python: '3.6'
-    install:
-    - pip install -r requirements.txt
-    - pip install -r cirq/contrib/contrib-requirements.txt
-    script: check/doctest -q
+language: node_js
+install: skip
+
+env:
+  # 'foobar' (bare)
+  - secure: "fN3M2AeZFdWE0NuPf2xg2WIlFg3gmFoSooOla5jmiRlxhsLZzMAcE6ZpN16PXSY7bBh597cnh4h+GqPzvm3aG8+3z27Xk+NKoiUYJKEno5pkak1VP11djsM6Bi/Nw166KKM6vgKs9kUUtiWb8KL4toJOm1SnSzN6tu9tSH8lvDFSn7WNUW+3e4Lg6zGrbkoC2ZOtWic6tvL0XzCJ0TjNDcfFmwpmjwkbVZxG6gKYpk4IqC84ik7tHPVqjT7XgRt35EFVvsJ2TBT6qekVBwg6NoEhmo1Zfa8fDI+STcVZ2530p/rFzzSclwkKwHvE0F6jmTq/fea/kzKzVlYjvG3kfz3FI1K2JqyR+s3wjtiHea4SkzcW00NwopYBCW5dgTr5XsxF5OqcjGJ+clPRNWr8HPEXX2eG8dNVWuJeM8FFr5lxCiWn9OXZD4u/T5bqlMi1np5TEPbm3DtARfARqx+FIpO+aG6e+dcIbTUzq+5ac+eoXzwblDDXNSev9M8Y5k01F/viGVMyMDe8d025a1herT7RRQUj66GM7Lyq1LLp3BR5+vknjtuXCMv8jTkpatrx2LINajbNYs0G+lt/Es1MezOdhpPRTqg1XMVKHT/zydyO4E+WwoM9WCJMYjg6Y7mKcZ4q0R+VE8gMHDrApuGnsr12LX9l7Vmla2ilNNW7mmA="
+  # 'foo=bar' (env var assignment)
+  - secure: "TsTcpKh1H3vALhbGCa5++o/zQIu9oxs6GHa5MijSMMmrfMjVKJ2cxDNNkNbyIDoC9NW4aqHXyF0S/CJdGX6SnLaCeKGoEnp4yJnSZON6LD0ilv44G7+qHsyGcrtTTPPKD9pE/gqIHP8tOYks9IAEybV54msiwaVS+HAztJYjIhyrKLLBcIgGAAKvXXBcq39o6xE8dyU2+ZpgOj30K6vZt38/EMn87crQ8NfM+UhQvB1WOXWU0ogkWrcy+JwSesn/fePlKVv2YktwB67wogPJTPG5WZwJIxUy+w8OHlCQf4YGDjSaD14z9DyVwYhgRV80e4pksBpmIWVMB5L+VupMVflshuua9zfiJidmVmIsuZjs0gqkAdUJTKtSxiHUCMKclA1PSi/RUwZ/2JxfwwNg4J7ctAzrTBJdVx6rYq99QMjXIJpJxgJC9jucagtxeOEiuczFPateMzgUt4q85K8DxqDhgeUetJj05bUpropAGrseXZX4Od2lRd9tklFAmrLHr/TqxTDC5GBM5Bc3ZDRJQK6K5VLp6QL0OpV98KdXgC6SnAM2t7EoE48gYU2/AY1PRSnvVlbAJHCYjmL0azUu13EGEQMWz8RHwwDWCPyVln7B6FEEyd6hWWkF33hRYDMVjVD6ZN5T51/ezhPgxjNhCR7NtkGoeyOGa6GBMMS/Ggg="
+
+script: skip
+
+notifications:
+  email: false
