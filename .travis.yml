@@ -1,80 +1,13 @@
-sudo: false
-language: python
-cache:
-  directories:
-  - ".benchmarks"
-branches:
-  only:
-  - master
-before_install:
-- pip install --upgrade pip setuptools wheel
-stages:
-- test
-- name: deploy
-  if: type = push AND branch = master
-matrix:
-  include:
-  - stage: test
-    os: linux
-    env: NAME=mypy
-    python: '3.6'
-    install:
-    - cat dev_tools/conf/pip-list-dev-tools.txt | grep mypy | xargs pip install
-    script: check/mypy
-  - stage: test
-    os: linux
-    env: NAME=pylint
-    python: '3.6'
-    install:
-    - cat dev_tools/conf/pip-list-dev-tools.txt | grep "pylint\|astroid" | grep -v
-      "#" | xargs pip install
-    script: check/pylint
-  - stage: test
-    os: linux
-    env: NAME=format
-    python: '3.6'
-    install:
-    - cat dev_tools/conf/pip-list-dev-tools.txt | grep yapf | xargs pip install
-    script: check/format-incremental
-  - stage: test
-    os: linux
-    env: NAME=pytest-and-incremental-coverage
-    python: '3.6'
-    install:
-    - pip install -r requirements.txt
-    - pip install -r cirq/contrib/contrib-requirements.txt
-    - pip install -r dev_tools/conf/pip-list-dev-tools.txt
-    script: check/pytest-and-incremental-coverage master --actually-quiet
-  - stage: test
-    os: linux
-    env: NAME=pytest (without contrib)
-    python: '3.7'
-    install:
-    - pip install -r requirements.txt
-    - pip install -r dev_tools/conf/pip-list-dev-tools.txt
-    script: check/pytest --ignore=cirq/contrib --benchmark-skip --actually-quiet
-  - stage: test
-    os: windows
-    env: NAME=pytest (Windows)
-    language: sh
-    python: '3.7.3'
-    before_install:
-    - powershell -command 'Set-MpPreference -DisableArchiveScanning $true'
-    - powershell -command 'Set-MpPreference -DisableBehaviorMonitoring $true'
-    - powershell -command 'Set-MpPreference -DisableRealtimeMonitoring $true'
-    - choco install python --version 3.7.3
-    - export PATH="/c/Python37:/c/Python37/Scripts:$PATH"
-    - python -m pip install --upgrade pip wheel
-    install:
-    - python -m pip install -r requirements.txt
-    - python -m pip install -r cirq/contrib/contrib-requirements.txt
-    - python -m pip install -r dev_tools/conf/pip-list-dev-tools.txt
-    script: check/pytest --benchmark-skip --actually-quiet
-  - stage: test
-    os: linux
-    env: NAME=doctest
-    python: '3.6'
-    install:
-    - pip install -r requirements.txt
-    - pip install -r cirq/contrib/contrib-requirements.txt
-    script: check/doctest -q
+language: node_js
+install: skip
+
+env:
+  # 'foobar' (bare)
+  - secure: "wV2wrvKlPew0Qn+7AVmKkSoofthP62kr6+tlU//YxRdwF/0g2smUHcdyS6wKgY+wQodSFFsSDZmIvqEOtitBz/Cv1YrmJoQ0ekVNfSSPjPynjA/cuIe7nGwsPvIh4ljWmWevhbQAjuHujP4htw/sv3qwgb49LlkkMXqQz29JSu+AgBQd1MOHeNnv6N8BVkn6JIh7/uQq8hNCaV1pqmCZpsOEVMxzZCdh9m4MUTf+pN0N3Ses5gtY6EFYbTQZitA0bd5h6e7RqXJ52wsqwtLP+LuO27kXXBXQVxkAxI/MTzgZsCof1mvSxROH5bOY+RReOqLw8C5vIcwvw5DrkGRKg/XmhA/U6/XN+6C4jmv4V2fFhlaU2JvZCHjqVtV6OkVufS+bsrJ7OuAxx2ewUBL0z7QnWmXnejvxxQfpc5XmFq4DiFmuyIEs31U5DN/umDKT9Psva/M1uYTgBHgbsMTw543arIZrjqU0x5cjAjK46xkjHPFFRK60KUI3AcauPwEq9xGAXHvi/3P7on9XGa+T/FXvpFFKgZvA1Aa4DgUgd3hgfcDi8CorXxghN1n+p+pB8qOUSMmXG1rfFxxOW2vkZp2vhwelifsSn4gAi+pvSdoFmJW9iW5EUSmqnBbWXEeJroVz+KVxYh7++z/ynbxJntc9t8040uUfnPVSOu3QRuY="
+  # 'foo=bar' (env var assignment)
+  - secure: "B6UxQcAIsQIQPOsTbe/BqcLQ9/b5AdXore1RW96bOohulgNXzvLQipx/4MyBsrs6nTNMDgQyW6PILmfZz1f1ZdXEDEUCQA+pC+zdeZlSYq7BT3/z8fTS8f4OSq4PVQ502okAe2+4ZN84cuHZCboS1SMP27WfPQCckS5lR3RfHprLns8sFQQb5z71vug3+B71wPxz0PLbQo+deqC/TnlYsvWdXbP8ArUG2L9Bor2HCiSZ5Aw97GMmegI8+EPQ/ddqRuQCclled/SZfmcQxefMDtHsYH8UbsJR9cFr9JfSnVNTFSRraaGzGSRhXJ0xi57tfk6KAttKOB9G4le7pJHALrpY1Wzc5EEcwCqRtucTxfDf8jD/o49WNeGD1A5l8xbarqSXZimolMhdFxuUfvwzxnfOtgb1b8HumTZasw/G9PvJKkxJdEZVn2Ps6uG1BPJuULpRnAUHemtM/YcaGQ9+6NiZ5hw1psF8nWkTypj/g5Qx1nNqaCYsKmLU7Z7gMvvKAKb8MW4pQf9WBeDterMVvWOV+Ce1+5JQjKqdWo/tv88plf8YcvxEesr9I2pNTjfMeupRzJCd9VLdPjK/cDYw5JV81gD1XIcBNk6WInFGEfubiF0qzchNAMe6BBApCk5cxk37jDkbUjoIxwsIywip0mckGir6nATsgWdVTFzhgrg="
+
+script: skip
+
+notifications:
+  email: false
