@@ -9,7 +9,7 @@ branches:
 before_install:
 - pip install --upgrade pip setuptools wheel
 after_install:
-- echo "Finish test!!!"
+- echo "Finish test!"
 stages:
 - test
 - name: deploy
