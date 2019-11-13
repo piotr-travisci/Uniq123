@@ -7,23 +7,16 @@ rust:
   - nightly
 
 os:
-  - osx
   - linux
 
 addons:
   apt:
     packages:
       - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - cmake
-      - gcc
-      - binutils-dev
 matrix:
   include:
-    - os: osx
+    - os: linux
       rust: stable
-      env: TOOLCHAIN=IOS
   allow_failures:
     - rust: nightly
   fast_finish: true
